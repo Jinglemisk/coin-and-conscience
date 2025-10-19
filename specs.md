@@ -6,6 +6,8 @@ React 18 + TS + Vite + Zustand + IndexedDB
 
 # Core Gameplay Loop
 
+The game maintains time via "ticks". Every second in real life is 10 ticks. 
+
 All phases of the game last a certain duration (in seconds), creating time pressure on the player.
 
 ## Daily Cycle
