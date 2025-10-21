@@ -39,12 +39,13 @@
   - Decide on a persistence-backed export (e.g., IndexedDB or downloadable JSON) for phase snapshots alongside the console log helper once storage work begins.
 
 ## Phase 2 – Inventory & Item Schema
+- **Status:** In progress. Canonical item catalog, inventory store + telemetry bridge, and QA drawer are live; future phases will hook gameplay loops into the store.
 - **Goals:** Establish the data structures for items and inventory management.
 - **Deliverables:**
   - Item model/types, including categories, tags (illegal, cursed), base price, weight, scarcity, and quality.
   - Inventory store with add/remove, weight limits, and config-driven capacities/restock quantities.
   - Simple UI list for inventory with placeholders and tag indicators.
-  - Logging of inventory actions (restock, consume) including tag metadata.
+  - Logging and telemetry of inventory actions (`inventory.restocked`, `inventory.itemConsumed`, `inventory.capacityExceeded`, `inventory.tagRevealed`) including tag metadata.
 - **Exit Criteria:** Can seed inventory, view items, enforce capacity, flag tagged items, and trace actions in logs.
 
 ## Phase 3 – Visitor Framework & Single Archetype

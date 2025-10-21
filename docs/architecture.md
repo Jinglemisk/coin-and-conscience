@@ -47,6 +47,13 @@ coin-and-conscience/
 
 Providers are composed in `App.tsx` in the order: Config → Feature Flags → Logger → Telemetry → Modifiers → Persistence → UI. This top-level composition mirrors the dependency graph (flags need config, logger/telemetry read flags, persistence/modifiers depend on both).
 
+## Inventory Data & Store
+- Canonical item definitions live in `src/data/items/`. `itemCatalog.ts` exports curated templates (category, weight, price, scarcity, quality, and tag metadata) while `itemTypes.ts` owns shared enums and helper types so both gameplay systems and data modules stay in sync.
+- The inventory slice (`src/features/inventory/inventoryStore.ts`) instantiates items from those templates, enforces the weight cap from `gameConfig.inventory`, and exposes add/remove/restock/reveal actions. Hidden tags track reveal metadata so appraisal-style flows can unlock them later without mutating the raw template.
+- Store actions emit structured events via `inventoryEvents.ts`; a lightweight `InventoryEventBridge` component forwards them to the logger and telemetry provider, emitting `inventory.restocked`, `inventory.itemConsumed`, `inventory.capacityExceeded`, and `inventory.tagRevealed` telemetry records.
+- `InventoryController` keeps the store in sync with config HMR, mirroring the strategy used by the time loop.
+- A collapsible QA drawer (`InventoryDrawer`) renders the live inventory, exposes restock/consume/reveal affordances, and anchors on the right edge of the prototype so the loop monitor remains the primary canvas.
+
 ## Persistence Boundaries
 - The groundwork from Phase 0 still applies: the `PersistenceClient` stub covers save/load/delete/list and strategy switching. Phase 1 did not introduce storage, but the snapshot export hook in the loop surface is ready to route through future persistence adapters.
 - Persistence strategy continues to derive from the `persistenceMode` feature flag, giving QA an immediate way to disable storage when debugging.

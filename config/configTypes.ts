@@ -37,6 +37,13 @@ export interface TaxConfig {
   localAuthorityTax: number;
 }
 
+export interface InventoryConfig {
+  /** Maximum total carry weight before upgrades or modifiers apply. */
+  baseWeightLimit: number;
+  /** Default number of items surfaced during a restock cycle. */
+  restockBatchSize: number;
+}
+
 export interface DangerThresholds {
   /** Soft warning level to surface UI cues. */
   warning: number;
@@ -73,6 +80,7 @@ export interface GameConfig {
   dayPhaseDurations: DayPhaseDurations;
   economy: EconomyConfig;
   taxes: TaxConfig;
+  inventory: InventoryConfig;
   danger: DangerThresholds;
   featureFlags: FeatureFlagRegistry;
 }

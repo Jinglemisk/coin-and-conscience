@@ -104,6 +104,8 @@ Implementation note: Each gameplay system keeps its state, logic, and feature-sp
 
 The Inventory is the backbone of the Player. It is where all Items are stored, regardless of their category, and can be filtered based on their category (Armor, Weapons, Books, etc.). Inventory has a Base Weight limit that can be altered with daily or permanent Upgrades.
 
+Item templates are authored under `src/data/items/` so tuning (weight, quality, scarcity, base price, tag metadata) stays centralised. Gameplay systems import those definitions rather than re-declaring ad-hoc copies.
+
 Every Item has:
 
 - Name: “Cuirass of the Temple…”
@@ -111,6 +113,7 @@ Every Item has:
 - Base Price: in. Gold
 - Category: The type of Item
 - Tags: Any tags like Illegal or Cursed, these may be hidden initially as “???”
+- Tag visibility defaults to **revealed**; special content can mark tags (or the whole item) as hidden so the player needs an appraisal or narrative trigger to flip them.
 
 Item Categories: Items fall under several categories:
 
@@ -127,6 +130,8 @@ Item Tags: Items can have one or several tags:
 - Cursed: Selling these to any Faction will decrease your Reputation and increase your Danger.
 
 Restocking: Players Restock every Week after the 5-day cycle is over. Players may only buy Items and not sell Items. Players can purchase permanent Upgrades.
+- Restock pulls from the shared catalog and respects config-driven knobs: `inventory.baseWeightLimit` gates total carried weight and `inventory.restockBatchSize` limits how many offers surface in a single batch.
+- Hidden or quest-classified items are curated manually; their tags start concealed and require specific triggers (e.g., appraisal) to reveal.
 
 ## Party Management
 
