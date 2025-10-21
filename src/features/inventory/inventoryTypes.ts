@@ -22,17 +22,12 @@ export interface InventoryItem {
 export interface InventoryAddOptions {
   source?: InventoryEventSource;
   batchId?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface InventoryRemoveOptions {
   source?: InventoryEventSource;
   reason?: 'consume' | 'discard' | 'sale';
-}
-
-export interface InventoryRestockOptions {
-  templates?: readonly ItemTemplate[];
-  batchId?: string;
-  source?: Extract<InventoryEventSource, 'restock' | 'reward'>;
 }
 
 export type InventoryMutationFailureReason = 'capacityExceeded' | 'itemNotFound';
@@ -46,18 +41,6 @@ export interface InventoryMutationResult {
   weightLimit: number;
   source: InventoryEventSource;
   metadata?: Record<string, unknown>;
-}
-
-export interface InventoryBatchResult {
-  added: readonly InventoryItem[];
-  rejected: readonly {
-    template: ItemTemplate;
-    reason: InventoryMutationFailureReason;
-    weightBefore: number;
-    weightAfter: number;
-  }[];
-  batchId?: string;
-  source: InventoryEventSource;
 }
 
 export interface InventoryTagRevealResult {

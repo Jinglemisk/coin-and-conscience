@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useLoggerStore, useTelemetry } from '@/app/providers';
-import { useInventoryStore } from './inventoryStore';
 import { subscribeToInventoryEvents } from './inventoryEvents';
 
 const INVENTORY_TAGS = ['inventory'] as const;
@@ -14,6 +13,8 @@ export const InventoryEventBridge = () => {
       switch (event.type) {
         case 'inventory.itemAdded': {
           const { item, weightBefore, weightAfter, source, metadata } = event;
+          const tagSummary = Array.isArray(metadata?.tagSummary) ? metadata?.tagSummary : [];
+          const price = typeof metadata?.price === 'number' ? Number(metadata?.price) : null;
           log(
             'info',
             'inventory.item.added',
@@ -23,12 +24,26 @@ export const InventoryEventBridge = () => {
               source,
               weightBefore,
               weightAfter,
-              tagSummary: metadata?.tagSummary ?? [],
+              tagSummary,
               quality: item.template.quality,
-              scarcity: item.template.scarcity
+              scarcity: item.template.scarcity,
+              price
             },
             INVENTORY_TAGS
           );
+
+          if (source === 'restock' && price !== null) {
+            telemetry.track(
+              'inventory.itemPurchased',
+              {
+                itemId: item.templateId,
+                name: item.template.name,
+                price,
+                weight: item.template.weight
+              },
+              INVENTORY_TAGS
+            );
+          }
           break;
         }
         case 'inventory.itemAddRejected': {
@@ -97,38 +112,6 @@ export const InventoryEventBridge = () => {
               instanceId,
               reason,
               source
-            },
-            INVENTORY_TAGS
-          );
-          break;
-        }
-        case 'inventory.restockCompleted': {
-          const { added, rejected, batchId, source } = event;
-          const { totalWeight, remainingCapacity } = useInventoryStore.getState();
-
-          log(
-            'info',
-            'inventory.restock.completed',
-            {
-              batchId,
-              source,
-              addedCount: added.length,
-              rejectedCount: rejected.length,
-              totalWeight,
-              remainingCapacity
-            },
-            INVENTORY_TAGS
-          );
-
-          telemetry.track(
-            'inventory.restocked',
-            {
-              batchId,
-              source,
-              addedCount: added.length,
-              rejectedCount: rejected.length,
-              totalWeight,
-              remainingCapacity
             },
             INVENTORY_TAGS
           );

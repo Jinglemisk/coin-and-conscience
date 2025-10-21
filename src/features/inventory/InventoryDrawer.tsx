@@ -1,7 +1,8 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
-import { listItemTemplates } from '@/data/items';
 import type { ItemTagKey } from '@/data/items';
+import { useTimeStore } from '@/features/time/timeStore';
+import { InventoryRestockModal } from './InventoryRestockModal';
 import { useInventoryStore } from './inventoryStore';
 import type { InventoryItem } from './inventoryTypes';
 
@@ -125,26 +126,24 @@ const summarizeTags = (item: InventoryItem) => {
 
 export const InventoryDrawer = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isRestockOpen, setRestockOpen] = useState(false);
 
   const items = useInventoryStore((state) => state.items);
   const totalWeight = useInventoryStore((state) => state.totalWeight);
   const weightLimit = useInventoryStore((state) => state.weightLimit);
   const remainingCapacity = useInventoryStore((state) => state.remainingCapacity);
-  const restock = useInventoryStore((state) => state.restock);
   const removeItem = useInventoryStore((state) => state.removeItem);
   const revealTag = useInventoryStore((state) => state.revealTag);
   const restockBatchSize = useInventoryStore((state) => state.restockBatchSize);
+
+  const currentPhase = useTimeStore((state) => state.phase);
+  const isWeekend = currentPhase === 'weekend';
 
   const sortedItems = useMemo(() => [...items].sort((a, b) => b.addedAt - a.addedAt), [items]);
 
   const handleToggle = useCallback(() => {
     setIsOpen((prev) => !prev);
   }, []);
-
-  const handleRestock = useCallback(() => {
-    const templates = [...listItemTemplates()].sort(() => Math.random() - 0.5);
-    restock({ templates });
-  }, [restock]);
 
   const handleConsume = useCallback(
     (instanceId: string) => {
@@ -160,6 +159,23 @@ export const InventoryDrawer = () => {
     [revealTag]
   );
 
+  const openRestock = useCallback(() => {
+    if (!isWeekend) {
+      return;
+    }
+    setRestockOpen(true);
+  }, [isWeekend]);
+
+  const closeRestock = useCallback(() => {
+    setRestockOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isWeekend && isRestockOpen) {
+      setRestockOpen(false);
+    }
+  }, [isRestockOpen, isWeekend]);
+
   const drawerStyle: CSSProperties = {
     ...drawerBaseStyle,
     transform: isOpen ? 'translateX(0)' : 'translateX(calc(100% - 48px))',
@@ -167,12 +183,13 @@ export const InventoryDrawer = () => {
   };
 
   return (
-    <aside style={drawerStyle}>
-      <button onClick={handleToggle} style={toggleStyle} type="button">
-        {isOpen ? '→' : '←'}
-      </button>
+    <>
+      <aside style={drawerStyle}>
+        <button onClick={handleToggle} style={toggleStyle} type="button">
+          {isOpen ? '→' : '←'}
+        </button>
 
-      {isOpen && (
+        {isOpen && (
         <>
           <header style={panelHeaderStyle}>
             <div>
@@ -181,7 +198,23 @@ export const InventoryDrawer = () => {
                 {sortedItems.length} items · {totalWeight.toFixed(1)}kg / {weightLimit.toFixed(1)}kg
               </p>
             </div>
-            <button onClick={handleRestock} style={buttonStyle} type="button">
+            <button
+              onClick={openRestock}
+              style={{
+                ...buttonStyle,
+                ...(isWeekend
+                  ? {}
+                  : {
+                      cursor: 'not-allowed',
+                      background: '#f2f2f2',
+                      borderColor: '#d0d0d0',
+                      color: '#8a8a8a'
+                    })
+              }}
+              type="button"
+              disabled={!isWeekend}
+              title={isWeekend ? 'Open restock offers' : 'Restock unlocks during the weekend phase'}
+            >
               Restock {restockBatchSize}
             </button>
           </header>
@@ -196,7 +229,7 @@ export const InventoryDrawer = () => {
           <div style={inventoryListStyle}>
             {sortedItems.length === 0 && (
               <div style={{ textAlign: 'center', color: '#777', fontSize: '0.9rem' }}>
-                Inventory is empty. Use Restock to add items.
+                Inventory is empty. Restock during the weekend to add items.
               </div>
             )}
 
@@ -258,6 +291,8 @@ export const InventoryDrawer = () => {
           </div>
         </>
       )}
-    </aside>
+      </aside>
+      <InventoryRestockModal isOpen={isRestockOpen} onClose={closeRestock} isWeekend={isWeekend} />
+    </>
   );
 };

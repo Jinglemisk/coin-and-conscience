@@ -1,5 +1,4 @@
 import type {
-  InventoryBatchResult,
   InventoryEventSource,
   InventoryItem,
   InventoryItemTagState,
@@ -43,10 +42,6 @@ export type InventoryEvent =
       source: InventoryEventSource;
       timestamp: number;
     }
-  | ({
-      type: 'inventory.restockCompleted';
-      timestamp: number;
-    } & InventoryBatchResult)
   | {
       type: 'inventory.tagRevealed';
       item: InventoryItem;

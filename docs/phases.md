@@ -39,13 +39,14 @@
   - Decide on a persistence-backed export (e.g., IndexedDB or downloadable JSON) for phase snapshots alongside the console log helper once storage work begins.
 
 ## Phase 2 – Inventory & Item Schema
-- **Status:** In progress. Canonical item catalog, inventory store + telemetry bridge, and QA drawer are live; future phases will hook gameplay loops into the store.
+- **Status:** In progress. Canonical item catalog, inventory store + telemetry bridge, weekend-aware restock modal, and QA drawer are live; future phases will hook gameplay loops into the store.
 - **Goals:** Establish the data structures for items and inventory management.
 - **Deliverables:**
   - Item model/types, including categories, tags (illegal, cursed), base price, weight, scarcity, and quality.
   - Inventory store with add/remove, weight limits, and config-driven capacities/restock quantities.
   - Simple UI list for inventory with placeholders and tag indicators.
-  - Logging and telemetry of inventory actions (`inventory.restocked`, `inventory.itemConsumed`, `inventory.capacityExceeded`, `inventory.tagRevealed`) including tag metadata.
+  - Weekend restock modal that surfaces purchasable offers, enforces gold/capacity checks, and debits gold using config-driven starting values.
+  - Logging and telemetry of inventory actions (`inventory.itemConsumed`, `inventory.capacityExceeded`, `inventory.itemPurchased`, `inventory.tagRevealed`) including tag metadata.
 - **Exit Criteria:** Can seed inventory, view items, enforce capacity, flag tagged items, and trace actions in logs.
 
 ## Phase 3 – Visitor Framework & Single Archetype
@@ -67,7 +68,13 @@
   - UI confirmation flow for buying and selling; refusal workflow updates satisfaction immediately.
   - Smoke script to simulate a day and export transaction log with satisfaction history.
   - Integration with `modifiersProvider` so global difficulty toggles influence pricing/danger deltas without bypassing feature boundaries.
+- **Prerequisite:** Finalise hidden-tag reveal triggers (Appraiser upgrade, party skills, narrative events) so Phase 4 can adjust reputation/danger outcomes correctly when players unknowingly sell flagged items.
 - **Exit Criteria:** Player can buy from and sell to visitor; gold/inventory adjust correctly; satisfaction feeds into post-visit evaluation; each transaction recorded with tag context; global modifiers influence results when toggled.
+- **Restock Offer Requirements:**
+  - Restock item selection must be generated via a shared helper that supports RNG weighting (rarity tiers, quest hooks, seeds) and configurable guarantees (e.g., at least one weapon, potion, etc.).
+  - Offer generation inputs and weighting knobs should live in config/data so balancing does not require code edits.
+  - Telemetry should capture generated offers (`inventory.offer.generated` or similar) for QA validation.
+  - Weekend restock UI must consume this helper to avoid diverging logic once visitor commerce is live.
 
 ## Phase 5 – Daily Wrap-up, Wages & Persistence
 - **Goals:** Close the day properly, handle economic sinks, and retain progress.

@@ -1,4 +1,4 @@
-export type DayPhase = 'morning' | 'day' | 'evening' | 'night';
+export type DayPhase = 'morning' | 'day' | 'evening' | 'night' | 'weekend';
 
 export interface TimeConfig {
   /** How many game ticks elapse per real-time second. */
@@ -26,6 +26,8 @@ export interface EconomyConfig {
   permanentUpgradeCostScalar: number;
   /** Restock cost adjustment factor controlled by modifiers/upgrades. */
   restockCostScalar: number;
+  /** Player's starting bankroll at the beginning of a run. */
+  startingGold: number;
 }
 
 export interface TaxConfig {

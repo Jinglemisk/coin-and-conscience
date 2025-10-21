@@ -1,18 +1,14 @@
 import { create } from 'zustand';
 import { useConfigStore } from '@/app/providers';
 import type { ItemTagKey, ItemTemplate } from '@/data/items';
-import { itemCatalog } from '@/data/items';
 import { publishInventoryEvent } from './inventoryEvents';
 import type {
   InventoryAddOptions,
-  InventoryBatchResult,
   InventoryEventSource,
   InventoryItem,
   InventoryItemTagState,
-  InventoryMutationFailureReason,
   InventoryMutationResult,
   InventoryRemoveOptions,
-  InventoryRestockOptions,
   InventoryState,
   InventoryTagRevealResult
 } from './inventoryTypes';
@@ -51,7 +47,6 @@ const initialRestockBatchSize = configSnapshot.getInventoryRestockBatchSize();
 interface InventoryStoreState extends InventoryState {
   addItem: (template: ItemTemplate, options?: InventoryAddOptions) => InventoryMutationResult;
   removeItem: (instanceId: string, options?: InventoryRemoveOptions) => InventoryMutationResult;
-  restock: (options?: InventoryRestockOptions) => InventoryBatchResult;
   revealTag: (instanceId: string, tagKey: ItemTagKey, source: string) => InventoryTagRevealResult;
   syncFromConfig: () => void;
   reset: () => void;
@@ -98,6 +93,11 @@ export const useInventoryStore = create<InventoryStoreState>((set, get) => ({
       revealOn: tag.revealOn
     }));
 
+    const metadata = {
+      tagSummary,
+      ...(options?.metadata ?? {})
+    };
+
     set((current) => {
       const totalWeight = Number((current.totalWeight + template.weight).toFixed(2));
       return {
@@ -116,7 +116,7 @@ export const useInventoryStore = create<InventoryStoreState>((set, get) => ({
       weightAfter,
       source,
       timestamp: Date.now(),
-      metadata: { tagSummary }
+      metadata
     });
 
     return {
@@ -126,7 +126,7 @@ export const useInventoryStore = create<InventoryStoreState>((set, get) => ({
       weightAfter,
       weightLimit: get().weightLimit,
       source,
-      metadata: { tagSummary }
+      metadata
     };
   },
   removeItem: (instanceId, options) => {
@@ -184,49 +184,6 @@ export const useInventoryStore = create<InventoryStoreState>((set, get) => ({
       source,
       metadata: options?.reason ? { reason: options.reason } : undefined
     };
-  },
-  restock: (options) => {
-    const source: InventoryEventSource = options?.source ?? 'restock';
-    const batchId = options?.batchId ?? `restock-${Date.now()}`;
-    const templates = options?.templates ?? itemCatalog;
-    const limit = get().restockBatchSize;
-
-    const added: InventoryItem[] = [];
-    const rejected: {
-      template: ItemTemplate;
-      reason: InventoryMutationFailureReason;
-      weightBefore: number;
-      weightAfter: number;
-    }[] = [];
-
-    for (const template of templates.slice(0, limit)) {
-      const result = get().addItem(template, { source, batchId });
-      if (result.success && result.item) {
-        added.push(result.item);
-      } else if (!result.success) {
-        rejected.push({
-          template,
-          reason: result.reason ?? 'capacityExceeded',
-          weightBefore: result.weightBefore,
-          weightAfter: result.weightAfter
-        });
-      }
-    }
-
-    const batch: InventoryBatchResult = {
-      added,
-      rejected,
-      batchId,
-      source
-    };
-
-    publishInventoryEvent({
-      type: 'inventory.restockCompleted',
-      ...batch,
-      timestamp: Date.now()
-    });
-
-    return batch;
   },
   revealTag: (instanceId, tagKey, source) => {
     const state = get();

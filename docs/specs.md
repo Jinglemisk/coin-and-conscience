@@ -35,6 +35,7 @@ End of the Week: After every 5th day, the week ends.
 - Day 1 → Day 2 → Day 3 → Day 4 → Day 5 → Weekend → [Repeat]
 - Travel: The player can change Regions.
 - Player can buy permanent Upgrades.
+- Restock: Player can purchase Items from a dedicated vendor to replenish their Inventory.
 
 ### Player Goals
 
@@ -74,6 +75,8 @@ Gold is lost when the player:
 - Pays Wages
 - Pays the Local Lord
 - Required by an Event
+
+The starting bankroll is tunable via `gameConfig.economy.startingGold` so balancing passes can adjust the early-game runway without touching feature code.
 
 ## Reputation
 
@@ -132,6 +135,7 @@ Item Tags: Items can have one or several tags:
 Restocking: Players Restock every Week after the 5-day cycle is over. Players may only buy Items and not sell Items. Players can purchase permanent Upgrades.
 - Restock pulls from the shared catalog and respects config-driven knobs: `inventory.baseWeightLimit` gates total carried weight and `inventory.restockBatchSize` limits how many offers surface in a single batch.
 - Hidden or quest-classified items are curated manually; their tags start concealed and require specific triggers (e.g., appraisal) to reveal.
+- Weekend restock happens through a dedicated modal where the player can review offers, inspect stats/price/weight, and spend gold; purchases are blocked outside the weekend phase or when gold/capacity are insufficient.
 
 ## Party Management
 

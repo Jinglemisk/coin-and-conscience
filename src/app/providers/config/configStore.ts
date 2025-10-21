@@ -14,6 +14,7 @@ interface ConfigState {
   getDefaultSpeedMultiplier: () => number;
   getInventoryBaseWeightLimit: () => number;
   getInventoryRestockBatchSize: () => number;
+  getStartingGold: () => number;
 }
 
 const createDerivedHelpers = (config: GameConfig) => ({
@@ -26,7 +27,8 @@ const createDerivedHelpers = (config: GameConfig) => ({
   getSpeedMultipliers: () => config.ticks.speedMultipliers,
   getDefaultSpeedMultiplier: () => config.ticks.defaultSpeedMultiplier,
   getInventoryBaseWeightLimit: () => config.inventory.baseWeightLimit,
-  getInventoryRestockBatchSize: () => config.inventory.restockBatchSize
+  getInventoryRestockBatchSize: () => config.inventory.restockBatchSize,
+  getStartingGold: () => config.economy.startingGold
 });
 
 const baseConfig = Object.freeze(gameConfig);

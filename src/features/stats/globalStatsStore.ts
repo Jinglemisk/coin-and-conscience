@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { DayPhase } from '#config/configTypes';
+import { useConfigStore } from '@/app/providers';
 import type { PhaseTransitionMeta } from '@/features/time/timeStore';
 
 export interface GlobalStats {
@@ -29,19 +30,22 @@ interface GlobalStatsState {
   reset: () => void;
 }
 
-const INITIAL_STATS: GlobalStats = Object.freeze({
-  gold: 0,
-  reputation: 0,
-  danger: 0,
-  heat: 0,
-  partySize: 0
-});
+const createInitialStats = (): GlobalStats => {
+  const config = useConfigStore.getState();
+  return {
+    gold: config.getStartingGold(),
+    reputation: 0,
+    danger: 0,
+    heat: 0,
+    partySize: 0
+  } as const;
+};
 
 const createSnapshotId = (transition: PhaseTransitionMeta) =>
   `${transition.tick}-${transition.from}-${transition.to}`;
 
 export const useGlobalStatsStore = create<GlobalStatsState>((set, get) => ({
-  stats: { ...INITIAL_STATS },
+  stats: { ...createInitialStats() },
   snapshots: [],
   updateStats: (partial) => {
     set((state) => ({
@@ -70,7 +74,7 @@ export const useGlobalStatsStore = create<GlobalStatsState>((set, get) => ({
   },
   reset: () => {
     set({
-      stats: { ...INITIAL_STATS },
+      stats: { ...createInitialStats() },
       snapshots: []
     });
   }
