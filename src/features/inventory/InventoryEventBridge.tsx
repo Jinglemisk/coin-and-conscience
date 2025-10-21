@@ -15,6 +15,14 @@ export const InventoryEventBridge = () => {
           const { item, weightBefore, weightAfter, source, metadata } = event;
           const tagSummary = Array.isArray(metadata?.tagSummary) ? metadata?.tagSummary : [];
           const price = typeof metadata?.price === 'number' ? Number(metadata?.price) : null;
+          const priceContext = metadata?.priceContext as
+            | {
+                resultingPrice: number;
+                appliedMultipliers?: readonly number[];
+                appliedAdditives?: readonly number[];
+              }
+            | undefined;
+
           log(
             'info',
             'inventory.item.added',
@@ -27,7 +35,9 @@ export const InventoryEventBridge = () => {
               tagSummary,
               quality: item.template.quality,
               scarcity: item.template.scarcity,
-              price
+              price,
+              priceMultipliers: priceContext?.appliedMultipliers ?? null,
+              priceAdditives: priceContext?.appliedAdditives ?? null
             },
             INVENTORY_TAGS
           );
@@ -39,7 +49,9 @@ export const InventoryEventBridge = () => {
                 itemId: item.templateId,
                 name: item.template.name,
                 price,
-                weight: item.template.weight
+                weight: item.template.weight,
+                appliedMultipliers: priceContext?.appliedMultipliers ?? [],
+                appliedAdditives: priceContext?.appliedAdditives ?? []
               },
               INVENTORY_TAGS
             );

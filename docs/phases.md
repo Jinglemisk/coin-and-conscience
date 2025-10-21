@@ -57,12 +57,18 @@
   - Interaction panel with stubbed actions (`Talk`, `Buy`, `Refuse`) logging every choice and satisfaction/relationship deltas.
   - Config knobs for visitor cadence, patience drain, base satisfaction adjustments, and talk time costs.
   - QA checklist: load visitor, talk, sell single item, refuse; verify satisfaction impacts logs.
+- **Must haves before starting:**
+  - Define visitor spawn cadence (visitors per Day phase, queue rules, skip/dismiss behaviour).
+  - Specify satisfaction math (starting value, thresholds, effects of haggling/talking/refusal) and how it converts into Reputation/Danger changes.
+  - Lock the Talk interaction spec (question sets, time costs, honesty signalling, reveal mechanics).
+  - Finalise faction taxonomy and alignment mappings so visitor data and satisfaction outcomes reference consistent factions.
 - **Exit Criteria:** Single generic visitor enters during Day, player can interact, satisfaction reacts to actions, and logs show full conversation with honesty flag.
 
 ## Phase 4 – Buy/Sell Transaction Loop
 - **Goals:** Enable core commerce without haggling, including satisfaction consequences.
 - **Deliverables:**
   - Pricing calc using config (markup/markdown multipliers, taxes placeholders, faction modifiers stubbed).
+  - Shared pricing helper (`src/services/pricing`) consumed by restock and visitor transactions to keep gold math consistent.
   - Transaction validation (inventory availability, gold adjustments) plus satisfaction adjustments based on price vs base value.
   - Audit log entry per transaction (timestamp, visitor, item, gold delta, satisfaction delta, tags involved).
   - UI confirmation flow for buying and selling; refusal workflow updates satisfaction immediately.

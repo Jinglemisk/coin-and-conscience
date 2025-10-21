@@ -136,6 +136,7 @@ Restocking: Players Restock every Week after the 5-day cycle is over. Players ma
 - Restock pulls from the shared catalog and respects config-driven knobs: `inventory.baseWeightLimit` gates total carried weight and `inventory.restockBatchSize` limits how many offers surface in a single batch.
 - Hidden or quest-classified items are curated manually; their tags start concealed and require specific triggers (e.g., appraisal) to reveal.
 - Weekend restock happens through a dedicated modal where the player can review offers, inspect stats/price/weight, and spend gold; purchases are blocked outside the weekend phase or when gold/capacity are insufficient.
+- Pricing and affordability are produced by the shared pricing service (`src/services/pricing`), ensuring the restock UX and future visitor commerce apply identical markup/markdown logic and gold gating.
 
 ## Party Management
 

@@ -3,6 +3,8 @@ import { useConfigStore } from '@/app/providers';
 import { listItemTemplates, type ItemTemplate } from '@/data/items';
 import { useGlobalStatsStore } from '@/features/stats/globalStatsStore';
 import { useInventoryStore } from './inventoryStore';
+import { applyTransaction, calculatePriceContext } from '@/services/pricing';
+import type { PriceCalculationResult } from '@/services/pricing';
 
 interface InventoryRestockModalProps {
   isOpen: boolean;
@@ -112,11 +114,10 @@ interface PurchaseFeedback {
   message: string;
 }
 
-const computeRestockPrice = (template: ItemTemplate, restockScalar: number) =>
-  Math.max(1, Math.round(template.basePrice * restockScalar));
-
 export const InventoryRestockModal = ({ isOpen, onClose, isWeekend }: InventoryRestockModalProps) => {
   const restockCostScalar = useConfigStore((state) => state.config.economy.restockCostScalar);
+  const baseSellMarkup = useConfigStore((state) => state.config.economy.baseSellMarkup);
+  const baseBuyMarkdown = useConfigStore((state) => state.config.economy.baseBuyMarkdown);
   const weightLimit = useInventoryStore((state) => state.weightLimit);
   const remainingCapacity = useInventoryStore((state) => state.remainingCapacity);
   const restockBatchSize = useInventoryStore((state) => state.restockBatchSize);
@@ -133,6 +134,21 @@ export const InventoryRestockModal = ({ isOpen, onClose, isWeekend }: InventoryR
     return templates.slice(0, restockBatchSize);
   }, [restockBatchSize]);
 
+  const offerPriceContexts = useMemo(() => {
+    return offers.map((template) => ({
+      template,
+      priceContext: calculatePriceContext({
+        basePrice: template.basePrice,
+        transaction: 'restock',
+        economy: {
+          restockCostScalar,
+          baseSellMarkup,
+          baseBuyMarkdown
+        }
+      })
+    }));
+  }, [offers, restockCostScalar, baseSellMarkup, baseBuyMarkdown]);
+
   const resetFeedback = useCallback(() => {
     setFeedback(null);
   }, []);
@@ -143,7 +159,7 @@ export const InventoryRestockModal = ({ isOpen, onClose, isWeekend }: InventoryR
   }, [onClose, resetFeedback]);
 
   const handlePurchase = useCallback(
-    (template: ItemTemplate) => {
+    (template: ItemTemplate, priceContext: PriceCalculationResult) => {
       resetFeedback();
 
       if (!isWeekend) {
@@ -151,17 +167,21 @@ export const InventoryRestockModal = ({ isOpen, onClose, isWeekend }: InventoryR
         return;
       }
 
-      const price = computeRestockPrice(template, restockCostScalar);
       const currentGold = useGlobalStatsStore.getState().stats.gold;
 
-      if (currentGold < price) {
+      const transaction = applyTransaction({ gold: currentGold, price: priceContext });
+
+      if (!transaction.success) {
         setFeedback({ type: 'error', message: 'Insufficient gold for this purchase.' });
         return;
       }
 
       const result = addItem(template, {
         source: 'restock',
-        metadata: { price }
+        metadata: {
+          price: priceContext.resultingPrice,
+          priceContext
+        }
       });
 
       if (!result.success) {
@@ -170,13 +190,13 @@ export const InventoryRestockModal = ({ isOpen, onClose, isWeekend }: InventoryR
         return;
       }
 
-      updateStats({ gold: currentGold - price });
+      updateStats({ gold: transaction.goldAfter });
       setFeedback({
         type: 'success',
-        message: `Purchased ${template.name} for ${price}g.`
+        message: `Purchased ${template.name} for ${priceContext.resultingPrice}g.`
       });
     },
-    [addItem, isWeekend, resetFeedback, restockCostScalar, updateStats]
+    [addItem, isWeekend, resetFeedback, updateStats]
   );
 
   if (!isOpen) {
@@ -218,10 +238,10 @@ export const InventoryRestockModal = ({ isOpen, onClose, isWeekend }: InventoryR
               </div>
             )}
 
-            {offers.map((offer) => {
-              const price = computeRestockPrice(offer, restockCostScalar);
+            {offerPriceContexts.map(({ template: offer, priceContext }) => {
               const fitsCapacity = offer.weight <= remainingCapacity;
-              const canAfford = gold >= price;
+              const affordability = applyTransaction({ gold, price: priceContext });
+              const canAfford = affordability.success;
               const isDisabled = !isWeekend || !fitsCapacity || !canAfford;
 
               return (
@@ -234,7 +254,7 @@ export const InventoryRestockModal = ({ isOpen, onClose, isWeekend }: InventoryR
                       </p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontWeight: 600 }}>{price}g</div>
+                      <div style={{ fontWeight: 600 }}>{priceContext.resultingPrice}g</div>
                       <div style={{ fontSize: '0.75rem', color: '#666' }}>{offer.weight.toFixed(1)}kg</div>
                     </div>
                   </header>
@@ -248,7 +268,7 @@ export const InventoryRestockModal = ({ isOpen, onClose, isWeekend }: InventoryR
                       {fitsCapacity ? 'Fits current capacity.' : 'Exceeds remaining capacity.'}
                     </div>
                     <button
-                      onClick={() => handlePurchase(offer)}
+                      onClick={() => handlePurchase(offer, priceContext)}
                       style={isDisabled ? disabledPurchaseButtonStyle : purchaseButtonStyle}
                       type="button"
                       disabled={isDisabled}

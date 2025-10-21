@@ -20,7 +20,7 @@ const ticks: TimeConfig = {
 
 const dayPhaseDurations: DayPhaseDurations = {
   morning: 5,
-  day: 10,
+  day: 5,
   evening: 5,
   night: 5,
   weekend: 45
@@ -31,7 +31,7 @@ const economy: EconomyConfig = {
   baseBuyMarkdown: 0.85,
   dailyUpgradeCostScalar: 1.0,
   permanentUpgradeCostScalar: 1.2,
-  restockCostScalar: 1.0,
+  restockCostScalar: 1,
   startingGold: 500
 };
 

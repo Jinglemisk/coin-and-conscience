@@ -58,6 +58,7 @@ Providers are composed in `App.tsx` in the order: Config → Feature Flags → L
 - `InventoryController` keeps the store in sync with config HMR, mirroring the strategy used by the time loop.
 - A collapsible QA drawer (`InventoryDrawer`) renders the live inventory, exposes consume/reveal affordances, and anchors on the right edge of the prototype so the loop monitor remains the primary canvas. A dedicated restock modal (`InventoryRestockModal`) unlocks during the weekend phase, showing purchasable offers, prices (restock scalar applied), gold totals, and remaining capacity before attempting to add items to the store.
 - `useGlobalStatsStore` seeds the player's bankroll from `gameConfig.economy.startingGold`, keeping the HUD and purchase flows in sync with the tunable economy config.
+- Shared pricing helpers live in `src/services/pricing/`, producing consistent buy/sell calculations (multipliers, additives, gold deltas). Both the weekend restock flow and future visitor commerce will call this module so tuning occurs in one place.
 
 ## Persistence Boundaries
 - The groundwork from Phase 0 still applies: the `PersistenceClient` stub covers save/load/delete/list and strategy switching. Phase 1 did not introduce storage, but the snapshot export hook in the loop surface is ready to route through future persistence adapters.
