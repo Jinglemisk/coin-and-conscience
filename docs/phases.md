@@ -16,7 +16,7 @@
 
 **How to run / verify**
 - Install dependencies then run `npm run dev` to launch the Vite prototype. Adjust values in `config/gameConfig.ts` or flip flags via `useFeatureFlagsStore().setFlag` in the dev console; the UI reflects updates immediately thanks to Vite HMR hooks.
-- Use the "Emit sample log & telemetry" button in the placeholder UI (`src/app/App.tsx`) to see logger and telemetry pipelines working together.
+- During Phase 0 the "Emit sample log & telemetry" button lived in the placeholder UI; Phase 1 replaced it with the live loop surface that continuously emits telemetry and structured logs on tick batches and phase transitions.
 
 **Leading into Phase 1**
 - Time controller will live under `src/features/time/`, consuming `useConfigStore` for tick cadence.
@@ -24,6 +24,7 @@
 - Reference outstanding questions in `docs/tech-notes.md` before locking satisfaction, danger, and tax formulas.
 
 ## Phase 1 – Core Timekeeping & Loop Skeleton
+- **Status:** Complete. Tick controller, loop monitor UI, telemetry/logging hooks, and phase snapshots are live; meters remain placeholder values until Phase 2+ systems adjust them.
 - **Goals:** Make the simulation tick in real time with QA-friendly observability.
 - **Deliverables:**
   - Time controller that advances ticks from `gameConfig`.
@@ -33,6 +34,9 @@
   - Basic wireframe view showing phase, tick, day counter, and top-bar stats (gold/reputation/danger/heat/party size).
   - Telemetry hooks on phase transitions and tick cadence so QA can trace loop performance via the shared provider.
 - **Exit Criteria:** Time flows correctly; phase boundaries fire events; telemetry and logs capture transitions so developers can review per-tick/per-phase data.
+- **Follow-ups:**
+  - Wire economy/visitor features into `useGlobalStatsStore` when they arrive so the HUD displays real deltas.
+  - Decide on a persistence-backed export (e.g., IndexedDB or downloadable JSON) for phase snapshots alongside the console log helper once storage work begins.
 
 ## Phase 2 – Inventory & Item Schema
 - **Goals:** Establish the data structures for items and inventory management.

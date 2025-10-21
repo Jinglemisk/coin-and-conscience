@@ -5,6 +5,12 @@ export interface TimeConfig {
   ticksPerSecond: number;
   /** Global cap to prevent runaway simulation update cycles. */
   maxTicksPerFrame: number;
+  /** Number of in-game days that comprise a week. */
+  daysPerWeek: number;
+  /** Allow-list of multipliers for accelerating or pausing time during QA sessions. */
+  speedMultipliers: readonly number[];
+  /** Default multiplier applied when the loop boots. */
+  defaultSpeedMultiplier: number;
 }
 
 export type DayPhaseDurations = Record<DayPhase, number>;

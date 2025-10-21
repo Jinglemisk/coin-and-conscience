@@ -19,8 +19,10 @@
 - Storage quotas: need max snapshot size and retention policy before enabling real IndexedDB writes.
 - Telemetry export format for QA (JSON Lines vs. zipped session package) once buffer UI exists.
 - Evaluate need for opt-in analytics consent prompt if telemetry eventually leaves the client.
+- Phase 1 snapshot exporter currently logs to console; when persistence work starts, decide whether to stream snapshots into IndexedDB or provide a downloadable JSON blob alongside telemetry buffers.
 
 ## Tooling & Testing
 - Decide on unit test harness (Vitest vs. Jest) before Phase 1 tick engine is implemented.
 - Establish storybook or component documentation approach once UI work begins.
 - Determine automated smoke script shape in `/scripts` (Node vs. browser automation) before Phase 4 commerce loop.
+- Validate that the fractional tick accumulator stays deterministic under QA speed multipliers; consider a debug view or test harness once automated tests land.

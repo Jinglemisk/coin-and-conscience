@@ -9,6 +9,9 @@ interface ConfigState {
   ticksToSeconds: (ticks: number) => number;
   getPhaseDurationSeconds: (phase: DayPhase) => number;
   getPhaseDurationTicks: (phase: DayPhase) => number;
+  getDaysPerWeek: () => number;
+  getSpeedMultipliers: () => ReadonlyArray<number>;
+  getDefaultSpeedMultiplier: () => number;
 }
 
 const createDerivedHelpers = (config: GameConfig) => ({
@@ -16,7 +19,10 @@ const createDerivedHelpers = (config: GameConfig) => ({
   ticksToSeconds: (ticks: number) => ticks / config.ticks.ticksPerSecond,
   getPhaseDurationSeconds: (phase: DayPhase) => config.dayPhaseDurations[phase],
   getPhaseDurationTicks: (phase: DayPhase) =>
-    Math.round(config.dayPhaseDurations[phase] * config.ticks.ticksPerSecond)
+    Math.round(config.dayPhaseDurations[phase] * config.ticks.ticksPerSecond),
+  getDaysPerWeek: () => config.ticks.daysPerWeek,
+  getSpeedMultipliers: () => config.ticks.speedMultipliers,
+  getDefaultSpeedMultiplier: () => config.ticks.defaultSpeedMultiplier
 });
 
 const baseConfig = Object.freeze(gameConfig);

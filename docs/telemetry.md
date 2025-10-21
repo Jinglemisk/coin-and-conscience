@@ -31,6 +31,7 @@ telemetry.track('time.phase.transition', {
 - Emit when state changes cross meaningful boundaries: phase transitions, visitor lifecycle events, transactions, modifier activation, etc.
 - Keep payloads small and serialisable; prefer identifiers over full objects.
 - Use consistent tags so future dashboards can filter (e.g., `['commerce']`, `['loop']`).
+- Phase 1 introduces `time.tick.batch`, `time.phase.transition`, and `time.phase.snapshot` events. These capture loop cadence, boundaries, and global stat snapshots and should be the canonical signals for QA when reviewing time behaviour.
 
 ## Future Work Hooks
 - A persistence-backed sink (IndexedDB) can be registered once the persistence provider is implemented.

@@ -37,6 +37,7 @@ logInfo('visitor.transaction.completed', {
   - Inventory and commerce actions (Phase 2+).
   - World events and modifiers (future phases).
 - Avoid excessive per-tick logs; prefer lifecycle hooks (phase boundary, visitor arrival, transaction completion).
+- Phase 1 adds structured loop entries (`time.phase.transition`, `time.snapshot.export`) emitted from the time controller and QA surface so reviewers can correlate phase boundaries with stat snapshots.
 
 ## Extensibility
 - Later phases can add sinks by calling `useLoggerStore.getState().log` or composing within a new provider. Keep log creation centralised in feature-specific helper functions to ensure consistent formatting.

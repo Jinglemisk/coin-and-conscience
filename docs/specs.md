@@ -20,7 +20,7 @@ Each cycle lasts an amount of seconds. End / beginning of each cycle is signalle
 - Day: Visitors enter the shop to Interact with the Player.
     - Buy / Sell: Exchange Items for Gold.
     - Haggle: Negotiate better prices.
-        - May be disabled during early phases via the `haggleEnabled` feature flag.
+        - May be disabled during early phases via the `haggle` feature flag.
     - Talk: Chat with the Visitors to learn their background and deduce their factions.
     - Refuse: Refuse service to a Visitor
     - Consequences: Every interaction affects either some or all of: Gold, Reputation, Danger
@@ -90,7 +90,7 @@ The number of Employees (hands, guards etc. that have been unlocked via Interact
 
 # Systems
 
-Implementation note: Each gameplay system keeps its state, logic, and feature-specific UI co-located in a `features/*` module (for example, `features/inventory`), while shared atoms and layout pieces live under `src/components/ui` and `src/components/layout`. Cross-cutting services (config, feature flags such as `haggleEnabled`, telemetry, persistence, and global modifiers) live in `src/app/providers` so they can influence multiple systems without breaking encapsulation.
+Implementation note: Each gameplay system keeps its state, logic, and feature-specific UI co-located in a `features/*` module (for example, `features/inventory`), while shared atoms and layout pieces live under `src/components/ui` and `src/components/layout`. Cross-cutting services (config, feature flags such as `haggle`, telemetry, persistence, and global modifiers) live in `src/app/providers` so they can influence multiple systems without breaking encapsulation.
 
 ### Global Services
 

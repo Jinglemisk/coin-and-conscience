@@ -11,14 +11,17 @@ import type {
 
 const ticks: TimeConfig = {
   ticksPerSecond: 10,
-  maxTicksPerFrame: 120
+  maxTicksPerFrame: 120,
+  daysPerWeek: 5,
+  speedMultipliers: [0, 0.5, 1, 2, 4],
+  defaultSpeedMultiplier: 1
 };
 
 const dayPhaseDurations: DayPhaseDurations = {
-  morning: 120,
-  day: 420,
-  evening: 120,
-  night: 90
+  morning: 10,
+  day: 100,
+  evening: 10,
+  night: 5
 };
 
 const economy: EconomyConfig = {
