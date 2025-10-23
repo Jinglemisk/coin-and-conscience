@@ -12,6 +12,9 @@ interface ConfigState {
   getDaysPerWeek: () => number;
   getSpeedMultipliers: () => ReadonlyArray<number>;
   getDefaultSpeedMultiplier: () => number;
+  getInventoryBaseWeightLimit: () => number;
+  getInventoryRestockBatchSize: () => number;
+  getStartingGold: () => number;
 }
 
 const createDerivedHelpers = (config: GameConfig) => ({
@@ -22,7 +25,10 @@ const createDerivedHelpers = (config: GameConfig) => ({
     Math.round(config.dayPhaseDurations[phase] * config.ticks.ticksPerSecond),
   getDaysPerWeek: () => config.ticks.daysPerWeek,
   getSpeedMultipliers: () => config.ticks.speedMultipliers,
-  getDefaultSpeedMultiplier: () => config.ticks.defaultSpeedMultiplier
+  getDefaultSpeedMultiplier: () => config.ticks.defaultSpeedMultiplier,
+  getInventoryBaseWeightLimit: () => config.inventory.baseWeightLimit,
+  getInventoryRestockBatchSize: () => config.inventory.restockBatchSize,
+  getStartingGold: () => config.economy.startingGold
 });
 
 const baseConfig = Object.freeze(gameConfig);

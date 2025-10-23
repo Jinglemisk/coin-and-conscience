@@ -160,7 +160,7 @@ When generating a Visitor, the game calculates:
 2. Need, to determine Interaction requirements
 3. Honesty, to determine their Appearance, Name
     1. If they are honest, they are generated from that Faction’s set of Appearance, Names and Talks
-    2. If they are dishonest, they are generated from any other random Faction’s set of Appearance, Names and Talks
+    2. If they are honest, they are generated from any other random Faction’s set of Appearance, Names and Talks
 4. All Talks are generated based on Honesty - Faction match.
 
 During the Interaction, the game calculates Satisfaction based on whether:
@@ -171,7 +171,7 @@ During the Interaction, the game calculates Satisfaction based on whether:
 
 After the Interaction, the Visitor +/- affects:
 
-- Reputation, based on their Satisfaction
+- Reputation, based on their Faction and Satisfaction
 - Danger, based on their Faction and Satisfaction
 
 ## Interactions
@@ -203,17 +203,29 @@ Upgrades are split in two categories:
 
 ## Reputation and Danger
 
-Reputation is a value of how popular, well-known Player is. 
+<aside>
+💡
 
-Higher Reputation increases:
-- The rate of a new Visitor spawning 
-- The chances of getting Visitors with higher base values of their Need Items. 
+Option 2: Reputation is Popularity, Danger is Chaos
 
-Danger has a value between 0-100. At 100 Danger the game is over. As Danger level increases, the following change:
+- Popularity:
+    - Increased chance of getting better / exotic customers
+    - Increased chance of getting better Events
+- Danger
+    - Increased chance of getting worse Events
+    - Decreased chance of interacting with Good-factions
 
-- Increased chance of negative events such as "Shoplifting" 
-- Decreased chance of getting Visitors from the "Good" faction.
-- Increased chance of getting Visitors from the "Evil" faction.
+•		•	Increased chance of interacting with Bad-factions
+
+</aside>
+
+Reputation has a value between -100 and +100. -100 implies morally-evil alignment, and +100 morally-good alignment.
+
+- Bad Reputation:
+
+Danger has a value between 0-100. At 100 Danger the game is over. Depending on the Danger level, the player can get:
+
+- Shoplifting and robbery attempts
 
 ## World Events
 
@@ -269,6 +281,22 @@ Regardless of the Screens, the player will always have the Stats Bar at the top 
 
 - Quick presets: low, medium, high, extreme margin. Each rolls against visitor patience and traits.
 - Up to three rounds; each round changes acceptance odds and drains patience. Traits like stubborn, gullible, thrifty, vengeful shape curves and post-sale effects.
+
+## Economy and risk (first-pass formulas)
+
+- Reserve price:
+    - r = base_price × scarcity_multiplier × quality_factor × reputation_factor
+- Offer acceptance:
+    - Accept if asked_price ≤ r × (1 + tolerance)
+    - Else probability: p = exp(−elasticity × (asked_price / r − 1 − tolerance))
+- Profit per sale:
+    - margin = asked_price − cost
+- Queued deltas per sale:
+    - danger_delta = kD × villain_power × margin_ratio × shady_factor − kH × hero_power × sold_to_hero_flag
+    - heat_delta = kT × illegal_flag × margin_ratio − permits_level × kP
+- Daily decay applied at debrief:
+    - danger = max(0, danger + sum(danger_delta) − guard_funding × dG)
+    - heat = max(0, heat + sum(heat_delta) − compliance_spend × dT)
 
 ## X Travel and Regions
 

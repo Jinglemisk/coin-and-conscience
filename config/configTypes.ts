@@ -1,4 +1,4 @@
-export type DayPhase = 'morning' | 'day' | 'evening' | 'night';
+export type DayPhase = 'morning' | 'day' | 'evening' | 'night' | 'weekend';
 
 export interface TimeConfig {
   /** How many game ticks elapse per real-time second. */
@@ -26,6 +26,8 @@ export interface EconomyConfig {
   permanentUpgradeCostScalar: number;
   /** Restock cost adjustment factor controlled by modifiers/upgrades. */
   restockCostScalar: number;
+  /** Player's starting bankroll at the beginning of a run. */
+  startingGold: number;
 }
 
 export interface TaxConfig {
@@ -35,6 +37,13 @@ export interface TaxConfig {
   weeklyTribute: number;
   /** Optional adjustable levy representing the local lord. */
   localAuthorityTax: number;
+}
+
+export interface InventoryConfig {
+  /** Maximum total carry weight before upgrades or modifiers apply. */
+  baseWeightLimit: number;
+  /** Default number of items surfaced during a restock cycle. */
+  restockBatchSize: number;
 }
 
 export interface DangerThresholds {
@@ -73,6 +82,7 @@ export interface GameConfig {
   dayPhaseDurations: DayPhaseDurations;
   economy: EconomyConfig;
   taxes: TaxConfig;
+  inventory: InventoryConfig;
   danger: DangerThresholds;
   featureFlags: FeatureFlagRegistry;
 }

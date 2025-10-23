@@ -28,7 +28,7 @@ logInfo('visitor.transaction.completed', {
 
 ## Structured Event Naming
 - Use dot-separated domains: `system.domain.action`.
-- Examples: `time.phase.transition`, `inventory.restock.complete`, `visitor.haggle.failed`.
+- Examples: `time.phase.transition`, `inventory.itemPurchased`, `visitor.haggle.failed`.
 - The first segment should match a feature folder when possible, helping cross-reference code paths.
 
 ## When to Log

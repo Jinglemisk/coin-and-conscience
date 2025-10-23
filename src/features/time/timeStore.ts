@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import type { DayPhase } from '#config/configTypes';
 import { useConfigStore } from '@/app/providers';
 
-const DAY_PHASE_ORDER: readonly DayPhase[] = ['morning', 'day', 'evening', 'night'];
+const STANDARD_PHASE_SEQUENCE: readonly DayPhase[] = ['morning', 'day', 'evening', 'night'];
+const ALL_PHASES: readonly DayPhase[] = [...STANDARD_PHASE_SEQUENCE, 'weekend'];
 
 type PhaseDurationMap = Record<DayPhase, number>;
 
@@ -36,16 +37,28 @@ interface TimeLoopState {
 
 const computePhaseDurations = (): PhaseDurationMap => {
   const config = useConfigStore.getState();
-  return DAY_PHASE_ORDER.reduce<PhaseDurationMap>((accumulator, phase) => {
+  return ALL_PHASES.reduce<PhaseDurationMap>((accumulator, phase) => {
     accumulator[phase] = config.getPhaseDurationTicks(phase);
     return accumulator;
   }, {} as PhaseDurationMap);
 };
 
-const getNextPhase = (phase: DayPhase): DayPhase => {
-  const currentIndex = DAY_PHASE_ORDER.indexOf(phase);
-  const nextIndex = (currentIndex + 1) % DAY_PHASE_ORDER.length;
-  return DAY_PHASE_ORDER[nextIndex];
+const getNextPhase = (phase: DayPhase, dayOfWeek: number, daysPerWeek: number): DayPhase => {
+  if (phase === 'night') {
+    return dayOfWeek === daysPerWeek ? 'weekend' : 'morning';
+  }
+
+  if (phase === 'weekend') {
+    return 'morning';
+  }
+
+  const currentIndex = STANDARD_PHASE_SEQUENCE.indexOf(phase);
+  if (currentIndex === -1) {
+    return 'morning';
+  }
+
+  const nextIndex = (currentIndex + 1) % STANDARD_PHASE_SEQUENCE.length;
+  return STANDARD_PHASE_SEQUENCE[nextIndex];
 };
 
 const deriveWeekMeta = (day: number, daysPerWeek: number) => {
@@ -92,10 +105,14 @@ export const useTimeStore = create<TimeLoopState>((set) => ({
 
         if (phaseTick >= currentPhaseDuration) {
           const from = phase;
-          const nextPhase = getNextPhase(phase);
+          const nextPhase = getNextPhase(phase, dayOfWeek, daysPerWeek);
 
           phase = nextPhase;
           phaseTick = 0;
+
+          if (nextPhase === 'weekend') {
+            dayTick = 0;
+          }
 
           if (nextPhase === 'morning') {
             day += 1;

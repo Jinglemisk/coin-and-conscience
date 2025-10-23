@@ -5,6 +5,7 @@ import type {
   FeatureFlagDefinition,
   FeatureFlagRegistry,
   GameConfig,
+  InventoryConfig,
   TaxConfig,
   TimeConfig
 } from './configTypes';
@@ -18,10 +19,11 @@ const ticks: TimeConfig = {
 };
 
 const dayPhaseDurations: DayPhaseDurations = {
-  morning: 10,
-  day: 100,
-  evening: 10,
-  night: 5
+  morning: 5,
+  day: 5,
+  evening: 5,
+  night: 5,
+  weekend: 45
 };
 
 const economy: EconomyConfig = {
@@ -29,13 +31,19 @@ const economy: EconomyConfig = {
   baseBuyMarkdown: 0.85,
   dailyUpgradeCostScalar: 1.0,
   permanentUpgradeCostScalar: 1.2,
-  restockCostScalar: 1.0
+  restockCostScalar: 1,
+  startingGold: 500
 };
 
 const taxes: TaxConfig = {
   dailyOperatingCost: 25,
   weeklyTribute: 150,
   localAuthorityTax: 0
+};
+
+const inventory: InventoryConfig = {
+  baseWeightLimit: 120,
+  restockBatchSize: 8
 };
 
 const danger: DangerThresholds = {
@@ -123,6 +131,7 @@ export const gameConfig: GameConfig = {
   dayPhaseDurations,
   economy,
   taxes,
+  inventory,
   danger,
   featureFlags
 };

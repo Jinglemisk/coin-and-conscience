@@ -1,6 +1,6 @@
 # Coin & Conscience — Architecture Brief (Phase 1)
 
-## Repository Layout (Phase 1 snapshot)
+## Repository Layout (Phase 2 snapshot)
 ```
 coin-and-conscience/
 ├─ config/
@@ -8,7 +8,7 @@ coin-and-conscience/
 │  └─ gameConfig.ts          # Canonical tuning values + feature flag registry
 ├─ src/
 │  ├─ app/
-│  │  ├─ App.tsx             # Phase 1 prototype surface and provider graph
+│  │  ├─ App.tsx             # Prototype surface and provider graph
 │  │  └─ providers/
 │  │     ├─ config/          # Config store + provider (Zustand)
 │  │     ├─ feature-flags/   # Config-driven flag registry + overrides
@@ -16,9 +16,13 @@ coin-and-conscience/
 │  │     ├─ telemetry/       # Telemetry contract + sink routing
 │  │     ├─ modifiers/       # Global modifier registry scaffold
 │  │     └─ persistence/     # Persistence strategy stub wired to flags
+│  ├─ components/            # Shared UI shells (placeholder during early phases)
+│  ├─ data/
+│  │  └─ items/              # Canonical item templates + shared item types
 │  ├─ features/
-│  │  ├─ time/               # Tick engine, QA controls, HUD surface
-│  │  └─ stats/              # Global stats store + phase snapshots
+│  │  ├─ inventory/          # Inventory store, restock modal, drawer, event bridge
+│  │  ├─ stats/              # Global stats store + phase snapshots
+│  │  └─ time/               # Tick engine, QA controls, HUD surface
 │  └─ main.tsx               # React bootstrap entry
 ├─ docs/                     # Living documentation (specs, phases, briefs)
 ├─ index.html                # Vite entry document
@@ -27,12 +31,12 @@ coin-and-conscience/
 └─ vite.config.ts            # Vite config with @ / #config aliases
 ```
 
-`features/time` now owns the simulation loop and UI scaffolding while `features/stats` centralises global meters for later gameplay systems.
+`features/time` still owns the simulation loop and UI scaffolding while `features/stats` centralises global meters; Phase 2 adds `features/inventory` for inventory management and `src/data/items` as the authoritative catalog location. `src/components` remains the staging ground for shared UI once the prototype grows beyond the monitoring surfaces.
 
 ## Timekeeping & Tick Strategy
 - Global tick rate is defined in `config/gameConfig.ts` (`ticksPerSecond`, `maxTicksPerFrame`, `daysPerWeek`). QA speed controls are also centralised there via `speedMultipliers` and the `defaultSpeedMultiplier` so the loop never depends on ad-hoc constants.
 - Conversions (`secondsToTicks`, `ticksToSeconds`, `getPhaseDuration*`, `getDaysPerWeek`) live in the `useConfigStore` derived helpers so later systems (time controller, visitor pacing, economy) fetch consistent math from one place.
-- Day phase lengths are stored as seconds in config to keep authoring human-readable; helpers expose both raw seconds and tick equivalents. The time store keeps per-phase tick counts in sync with Vite HMR.
+- Day phase lengths are stored as seconds in config to keep authoring human-readable; helpers expose both raw seconds and tick equivalents. The time store keeps per-phase tick counts in sync with Vite HMR, including the dedicated `weekend` phase that fires after the fifth night and before the next week's morning boot.
 - `features/time/timeStore.ts` holds the authoritative loop state (tick counter, phase, day/week metadata, QA speed selection). A companion `TimeController` component wraps `requestAnimationFrame`, applies the active multiplier, respects pauses, caps work to `maxTicksPerFrame`, and accumulates fractional tick debt so sub-frame timing keeps the loop advancing smoothly.
 - The controller emits structured logs (`time.phase.transition`, `time.snapshot.export`) and telemetry events (`time.tick.batch`, `time.phase.transition`, `time.phase.snapshot`) so QA can inspect cadence and boundaries in real time.
 
@@ -46,6 +50,15 @@ coin-and-conscience/
 - **Persistence Provider:** stub client with a strategy selector (indexedDb/session/off) driven by feature flags. Real storage hooks will replace the console-log stubs in the persistence phase without altering consumers.
 
 Providers are composed in `App.tsx` in the order: Config → Feature Flags → Logger → Telemetry → Modifiers → Persistence → UI. This top-level composition mirrors the dependency graph (flags need config, logger/telemetry read flags, persistence/modifiers depend on both).
+
+## Inventory Data & Store
+- Canonical item definitions live in `src/data/items/`. `itemCatalog.ts` exports curated templates (category, weight, price, scarcity, quality, and tag metadata) while `itemTypes.ts` owns shared enums and helper types so both gameplay systems and data modules stay in sync.
+- The inventory slice (`src/features/inventory/inventoryStore.ts`) instantiates items from those templates, enforces the weight cap from `gameConfig.inventory`, and exposes add/remove/restock/reveal actions. Hidden tags track reveal metadata so appraisal-style flows can unlock them later without mutating the raw template.
+- Store actions emit structured events via `inventoryEvents.ts`; a lightweight `InventoryEventBridge` component forwards them to the logger and telemetry provider, emitting `inventory.itemConsumed`, `inventory.capacityExceeded`, `inventory.itemPurchased`, and `inventory.tagRevealed` telemetry records.
+- `InventoryController` keeps the store in sync with config HMR, mirroring the strategy used by the time loop.
+- A collapsible QA drawer (`InventoryDrawer`) renders the live inventory, exposes consume/reveal affordances, and anchors on the right edge of the prototype so the loop monitor remains the primary canvas. A dedicated restock modal (`InventoryRestockModal`) unlocks during the weekend phase, showing purchasable offers, prices (restock scalar applied), gold totals, and remaining capacity before attempting to add items to the store.
+- `useGlobalStatsStore` seeds the player's bankroll from `gameConfig.economy.startingGold`, keeping the HUD and purchase flows in sync with the tunable economy config.
+- Shared pricing helpers live in `src/services/pricing/`, producing consistent buy/sell calculations (multipliers, additives, gold deltas). Both the weekend restock flow and future visitor commerce will call this module so tuning occurs in one place.
 
 ## Persistence Boundaries
 - The groundwork from Phase 0 still applies: the `PersistenceClient` stub covers save/load/delete/list and strategy switching. Phase 1 did not introduce storage, but the snapshot export hook in the loop surface is ready to route through future persistence adapters.

@@ -15,7 +15,7 @@ const formatMultiplier = (multiplier: number) => {
 
 const containerStyle: CSSProperties = {
   fontFamily: 'system-ui, sans-serif',
-  padding: '1.5rem',
+  padding: '1.5rem 22rem 1.5rem 1.5rem',
   display: 'grid',
   gap: '1.5rem'
 };

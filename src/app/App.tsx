@@ -8,11 +8,15 @@ import {
 } from './providers';
 import { PhaseOneSurface } from '@/features/time/PhaseOneSurface';
 import { TimeController } from '@/features/time/TimeController';
+import { InventoryController, InventoryDrawer, InventoryEventBridge } from '@/features/inventory';
 
 const PhaseOnePrototype = () => (
   <>
     <TimeController />
+    <InventoryController />
+    <InventoryEventBridge />
     <PhaseOneSurface />
+    <InventoryDrawer />
   </>
 );
 
