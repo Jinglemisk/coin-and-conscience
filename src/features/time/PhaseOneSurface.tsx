@@ -1,6 +1,7 @@
 import { useCallback, useMemo, type ChangeEvent, type CSSProperties } from 'react';
 import { useConfigStore, useLoggerStore } from '@/app/providers';
 import { useGlobalStatsStore } from '@/features/stats/globalStatsStore';
+import { VisitorPanel } from '@/features/visitors';
 import { useTimeStore } from './timeStore';
 
 const formatMultiplier = (multiplier: number) => {
@@ -190,6 +191,8 @@ export const PhaseOneSurface = () => {
           Export snapshots to log
         </button>
       </section>
+
+      <VisitorPanel />
     </main>
   );
 };

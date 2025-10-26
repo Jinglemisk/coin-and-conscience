@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { gameConfig } from '#config/gameConfig';
-import type { DayPhase, GameConfig } from '#config/configTypes';
+import type { DayPhase, GameConfig, VisitorConfig } from '#config/configTypes';
 
 interface ConfigState {
   config: GameConfig;
@@ -15,6 +15,9 @@ interface ConfigState {
   getInventoryBaseWeightLimit: () => number;
   getInventoryRestockBatchSize: () => number;
   getStartingGold: () => number;
+  getVisitorConfig: () => VisitorConfig;
+  getVisitorArrivalIntervalTicks: () => number;
+  getVisitorTalkTimeCostTicks: () => number;
 }
 
 const createDerivedHelpers = (config: GameConfig) => ({
@@ -28,7 +31,12 @@ const createDerivedHelpers = (config: GameConfig) => ({
   getDefaultSpeedMultiplier: () => config.ticks.defaultSpeedMultiplier,
   getInventoryBaseWeightLimit: () => config.inventory.baseWeightLimit,
   getInventoryRestockBatchSize: () => config.inventory.restockBatchSize,
-  getStartingGold: () => config.economy.startingGold
+  getStartingGold: () => config.economy.startingGold,
+  getVisitorConfig: () => config.visitors,
+  getVisitorArrivalIntervalTicks: () =>
+    Math.round(config.visitors.dayPhaseArrivalIntervalSeconds * config.ticks.ticksPerSecond),
+  getVisitorTalkTimeCostTicks: () =>
+    Math.round(config.visitors.talkTimeCostSeconds * config.ticks.ticksPerSecond)
 });
 
 const baseConfig = Object.freeze(gameConfig);

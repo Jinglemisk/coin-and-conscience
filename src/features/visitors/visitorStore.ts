@@ -340,8 +340,8 @@ export const useVisitorStore = create<VisitorStoreState>((set, get) => ({
         return state;
       }
 
-      const satisfactionDelta = state.refusePenalty;
-      const satisfactionAfter = clamp(active.satisfaction + satisfactionDelta, 0, 100);
+      const satisfactionAfter = 0;
+      const satisfactionDelta = satisfactionAfter - active.satisfaction;
 
       const logEntry = createLogEntry('refuse', 'Player refused service.', satisfactionAfter);
 

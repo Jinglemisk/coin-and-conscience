@@ -9,10 +9,13 @@ import {
 import { PhaseOneSurface } from '@/features/time/PhaseOneSurface';
 import { TimeController } from '@/features/time/TimeController';
 import { InventoryController, InventoryDrawer, InventoryEventBridge } from '@/features/inventory';
+import { VisitorArrivalManager, VisitorDebugBridge } from '@/features/visitors';
 
 const PhaseOnePrototype = () => (
   <>
     <TimeController />
+    <VisitorArrivalManager />
+    <VisitorDebugBridge />
     <InventoryController />
     <InventoryEventBridge />
     <PhaseOneSurface />
