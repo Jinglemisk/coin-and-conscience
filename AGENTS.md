@@ -25,4 +25,5 @@
 
 ## Commit & Collaboration Practices
 - Use short, imperative commit titles (e.g., `Wire visitor cadence knobs`) with bodies referencing any synced docs or config updates.
+- After any change in code, check whether`docs/architecture.md` or other Documentational files need updating. 
 - Hand-off notes should list the feature slice touched, `npm run build` status, manual checks performed, and any outstanding doc deltas.
