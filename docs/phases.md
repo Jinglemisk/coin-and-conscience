@@ -50,13 +50,15 @@
 - **Exit Criteria:** Can seed inventory, view items, enforce capacity, flag tagged items, and trace actions in logs.
 
 ## Phase 3 – Visitor Framework & Single Archetype
+- **Status:** Complete. Visitor cadence is config-driven, the Serene Envoy template spawns during Day, the interaction panel handles Talk/Buy/Refuse with logging + telemetry, and QA helpers document the slice.
 - **Goals:** Build the visitor pipeline with one generic buyer while wiring in satisfaction/honesty scaffolding.
 - **Deliverables:**
   - Visitor model (id, display name, appearance placeholder, faction placeholder, honesty flag, satisfaction meter, need template, patience).
   - Queue/arrival manager responding to day phases and config cadence.
   - Interaction panel with stubbed actions (`Talk`, `Buy`, `Refuse`) logging every choice and satisfaction/relationship deltas.
-  - Config knobs for visitor cadence, patience drain, base satisfaction adjustments, and talk time costs.
-  - QA checklist: load visitor, talk, sell single item, refuse; verify satisfaction impacts logs.
+  - Config knobs for visitor cadence, patience drain, base satisfaction adjustments, first-talk gain, fulfillment rewards, and talk time costs.
+  - QA checklist: load visitor, talk, sell single item, refuse; verify satisfaction impacts logs (dev helper exposed as `window.__debugVisitors.runPhase3Smoke()`).
+
 - **Exit Criteria:** Single generic visitor enters during Day, player can interact, satisfaction reacts to actions, and logs show full conversation with honesty flag.
 
 ## Phase 4 – Buy/Sell Transaction Loop

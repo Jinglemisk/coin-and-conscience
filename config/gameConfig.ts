@@ -7,7 +7,8 @@ import type {
   GameConfig,
   InventoryConfig,
   TaxConfig,
-  TimeConfig
+  TimeConfig,
+  VisitorConfig
 } from './configTypes';
 
 const ticks: TimeConfig = {
@@ -20,7 +21,7 @@ const ticks: TimeConfig = {
 
 const dayPhaseDurations: DayPhaseDurations = {
   morning: 5,
-  day: 5,
+  day: 60,
   evening: 5,
   night: 5,
   weekend: 45
@@ -44,6 +45,19 @@ const taxes: TaxConfig = {
 const inventory: InventoryConfig = {
   baseWeightLimit: 120,
   restockBatchSize: 8
+};
+
+const visitors: VisitorConfig = {
+  dayPhaseArrivalIntervalSeconds: 2,
+  maxQueueDepth: 1,
+  basePatienceTicks: 150,
+  patienceDrainPerInteraction: 12,
+  idlePatienceDrainPerTick: 0.5,
+  baseSatisfaction: 60,
+  talkSatisfactionDelta: 5,
+  needFulfilledSatisfactionDelta: 15,
+  refusePenalty: -60,
+  talkTimeCostSeconds: 2
 };
 
 const danger: DangerThresholds = {
@@ -132,6 +146,7 @@ export const gameConfig: GameConfig = {
   economy,
   taxes,
   inventory,
+  visitors,
   danger,
   featureFlags
 };

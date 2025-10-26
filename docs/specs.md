@@ -154,6 +154,13 @@ Every Visitor is defined by several key attributes:
 - Talk: Generic lines based on their Faction and Honesty.
 - Honesty: Whether their Appearance and Talk are in line with his Faction affiliation.
 
+### Phase 3 placeholder slice
+
+- Prototype ships with a single visitor template, the Serene Envoy (Mira of the Emberway), who arrives during the Day phase with a neutral faction placeholder and an honesty flag surfaced for QA instrumentation.
+- Arrivals, patience budgets, talk time costs, and baseline satisfaction are tunable via `config.visitors` and exposed through the config store helpers so later balancing passes can shift cadence without changing feature code.
+- The interaction panel exposes Talk, Buy (Phase 4 commerce stub), and Refuse. Talk consumes patience using the configured drains and awards a one-time satisfaction bump (`talkSatisfactionDelta`) on the first conversation only; Buy records a completed visit, grants the placeholder fulfillment bonus (`needFulfilledSatisfactionDelta`), and clears the visitor without touching inventory or gold; Refuse drops satisfaction by the configured penalty and immediately clears the visitor.
+- Structured logs (`visitor.*`) and telemetry events mirror each action, and the QA helper `window.__debugVisitors.runPhase3Smoke()` exercises a spawn → talk → sale stub → refusal loop to verify the slice during manual testing.
+
 When generating a Visitor, the game calculates:
 
 1. Faction, to determine Reputation outcomes

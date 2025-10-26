@@ -60,6 +60,13 @@ Providers are composed in `App.tsx` in the order: Config → Feature Flags → L
 - `useGlobalStatsStore` seeds the player's bankroll from `gameConfig.economy.startingGold`, keeping the HUD and purchase flows in sync with the tunable economy config.
 - Shared pricing helpers live in `src/services/pricing/`, producing consistent buy/sell calculations (multipliers, additives, gold deltas). Both the weekend restock flow and future visitor commerce will call this module so tuning occurs in one place.
 
+## Visitor Framework (Phase 3)
+- Visitor tuning lives in `config/configTypes.ts`/`config/gameConfig.ts` under `visitors`, covering day-phase arrival cadence, queue limits, patience drains, baseline satisfaction, first-talk satisfaction (`talkSatisfactionDelta`), fulfillment rewards (`needFulfilledSatisfactionDelta`), and refusal penalties. `useConfigStore` exposes helpers for arrival/talk tick conversions so features avoid duplicating math.
+- The visitor slice (`src/features/visitors/visitorStore.ts`) maintains the active visitor, queue, action log, and cadence timers. It consumes the stored config snapshot to spawn the Phase 3 template (`visitorContent.ts`), drain patience per tick/action, and surface Talk/Buy/Refuse actions with structured result payloads.
+- `VisitorArrivalManager` subscribes to the time store to drive cadence off the Day phase, emits `visitor.*` logger + telemetry events for spawns/promotions/timeouts, and resynchronises whenever config changes via `syncFromConfig`.
+- `VisitorPanel` renders the playable slice inside the Phase 1 surface: it shows persona, need summary, patience/satisfaction meters, action buttons, and the recent interaction log while relaying player choices to the logger/telemetry providers.
+- The debug bridge registers `window.__debugVisitors.runPhase3Smoke()` so QA can spawn the Serene Envoy, trigger talk, log the placeholder sale, and refuse service in one script without leaving the console.
+
 ## Persistence Boundaries
 - The groundwork from Phase 0 still applies: the `PersistenceClient` stub covers save/load/delete/list and strategy switching. Phase 1 did not introduce storage, but the snapshot export hook in the loop surface is ready to route through future persistence adapters.
 - Persistence strategy continues to derive from the `persistenceMode` feature flag, giving QA an immediate way to disable storage when debugging.

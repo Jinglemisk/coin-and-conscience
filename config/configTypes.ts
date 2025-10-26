@@ -46,6 +46,29 @@ export interface InventoryConfig {
   restockBatchSize: number;
 }
 
+export interface VisitorConfig {
+  /** Baseline interval (in seconds) between visitor arrivals while the shop is open. */
+  dayPhaseArrivalIntervalSeconds: number;
+  /** Maximum number of visitors that can wait in the queue before spawns pause. */
+  maxQueueDepth: number;
+  /** Initial patience budget (in ticks) granted to newly spawned visitors. */
+  basePatienceTicks: number;
+  /** Patience drained whenever the player performs an interaction with the visitor. */
+  patienceDrainPerInteraction: number;
+  /** Passive patience drain applied each tick the visitor waits with no progress. */
+  idlePatienceDrainPerTick: number;
+  /** Starting satisfaction score for visitors. */
+  baseSatisfaction: number;
+  /** Satisfaction delta applied on the first talk. */
+  talkSatisfactionDelta: number;
+  /** Satisfaction delta applied when the visitor's need is fulfilled. */
+  needFulfilledSatisfactionDelta: number;
+  /** Satisfaction delta applied when the player refuses service. */
+  refusePenalty: number;
+  /** Time cost (seconds) consumed when the player talks to a visitor. */
+  talkTimeCostSeconds: number;
+}
+
 export interface DangerThresholds {
   /** Soft warning level to surface UI cues. */
   warning: number;
@@ -83,6 +106,7 @@ export interface GameConfig {
   economy: EconomyConfig;
   taxes: TaxConfig;
   inventory: InventoryConfig;
+  visitors: VisitorConfig;
   danger: DangerThresholds;
   featureFlags: FeatureFlagRegistry;
 }
